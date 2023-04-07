@@ -1,5 +1,4 @@
-import posts from "./tuits.js";
-let tuits = posts;
+import * as tuitsDao from './tuits-dao.js'
 
 // retrieve data from HTTP body
 // add _id field as a time stamp
@@ -8,23 +7,19 @@ let tuits = posts;
 // append new tuit to tuits array
 // respond with new tuit
 // next chapter will store in database instead
-const createTuit = (req, res) => {
+const createTuit = async (req, res) => {
     const newTuit = req.body;
-    newTuit._id = (new Date()).getTime()+'';
     newTuit.likes = 0;
     newTuit.liked = false;
-    tuits.push(newTuit);
-    res.json(newTuit);
+    const insertedTuit = await tuitsDao
+        .createTuit(newTuit);
+    res.json(insertedTuit);
 }
 
-const findTuits  = (req, res) => {
-    const type = req.query.type
-    if(type) {
-        const tuitsOfType = tuits
-            .filter(t => t.type === type)
-        res.json(tuitsOfType)
-        return
-    }
+// now it's asynchronous function
+// retrieve tuits from database
+const findTuits  = async (req, res) => {
+    const tuits = await tuitsDao.findTuits()
     res.json(tuits)
 }
 
@@ -36,21 +31,20 @@ const findTuits  = (req, res) => {
 // merging/updating old tuit with updates
 // respond with success
 // next chapter will remove from database instead
-const updateTuit = (req, res) => {
+const updateTuit = async (req, res) => {
     const tuitdIdToUpdate = req.params.tid;
     const updates = req.body;
-    const tuitIndex = tuits.findIndex(
-        (t) => t._id === tuitdIdToUpdate)
-    tuits[tuitIndex] =
-        {...tuits[tuitIndex], ...updates};
-    res.sendStatus(200);
+    const status = await tuitsDao
+        .updateTuit(tuitdIdToUpdate,
+            updates);
+    res.json(status);
 }
 
-const deleteTuit = (req, res) => {
+const deleteTuit = async (req, res) => {
     const tuitdIdToDelete = req.params.tid;
-    tuits = tuits.filter((t) =>
-        t._id !== tuitdIdToDelete);
-    res.sendStatus(200);
+    const status = await tuitsDao
+        .deleteTuit(tuitdIdToDelete);
+    res.json(status);
 }
 
 export default (app) => {
