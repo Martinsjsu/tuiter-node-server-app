@@ -9,6 +9,14 @@ import * as tuitsDao from './tuits-dao.js'
 // next chapter will store in database instead
 const createTuit = async (req, res) => {
     const newTuit = req.body;
+    newTuit.topic = "General";
+    newTuit.time = "1h";
+    newTuit.title = "A new general tuit";
+    newTuit.image = "nasa.jpg";
+    newTuit.replies = 5;
+    newTuit.retuits = 10;
+    newTuit.handle = "@nasa"
+    newTuit.username = "NASA"
     newTuit.likes = 0;
     newTuit.liked = false;
     const insertedTuit = await tuitsDao
